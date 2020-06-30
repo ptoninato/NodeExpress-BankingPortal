@@ -4,9 +4,11 @@ const express = require('express');
 
 var app = express();
 app.set('views', path.join(__dirname, './views'));
+app.set('view engine', 'ejs')
 app.use('/css', express.static(path.join(__dirname, '/public/css')));
 app.use('/js', express.static(path.join(__dirname, '/public/js')));
-app.set('view engine', 'ejs')
+app.use('POST', express.urlencoded({ extended: true}));
+
 
 const accountData = fs.readFileSync('./src/json/accounts.json', {
   encoding: 'UTF8'
@@ -47,6 +49,10 @@ app.get('/profile', (req, res) => {
   res.render('profile', {
     user: users[0]
   });
+});
+
+app.get('/transfer', (req, res) => {
+  res.render('transfer');
 });
 
 
