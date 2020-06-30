@@ -7,7 +7,7 @@ app.set('views', path.join(__dirname, './views'));
 app.set('view engine', 'ejs')
 app.use('/css', express.static(path.join(__dirname, '/public/css')));
 app.use('/js', express.static(path.join(__dirname, '/public/js')));
-app.use('POST', express.urlencoded({ extended: true}));
+app.use('/transfer', express.urlencoded({ extended: true}));
 
 
 const accountData = fs.readFileSync('./src/json/accounts.json', {
@@ -53,6 +53,18 @@ app.get('/profile', (req, res) => {
 
 app.get('/transfer', (req, res) => {
   res.render('transfer');
+});
+
+app.post('/transfer', (req, res) => {
+  accounts[req.body.from].balance -= req.body.amount;
+  accounts[req.body.to].balance += parseInt(req.body.amount);
+
+  accountsJSON = JSON.stringify(accounts);
+  fs.writeFileSync(path.join(__dirname, 'json/accounts.json'), accountsJSON, "UTF8");
+
+  res.render('transfer', {
+    message: 'Transfer Completed'
+  });
 });
 
 
