@@ -75,7 +75,7 @@ app.get('/payment', (req, res) => {
 
 app.post('/payment', (req, res) => {
   accounts.credit.balance -= req.body.amount;
-  accounts.credit.avaialbe += parseInt(req.body.amount);
+  accounts.credit.available += parseInt(req.body.amount);
   accountsJSON = JSON.stringify(accounts);
   fs.writeFileSync(path.join(__dirname, 'json/accounts.json'), accountsJSON, "UTF8");
   res.render('payment', {
