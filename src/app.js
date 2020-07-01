@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+const { accounts, users, writeJSON} = require('./data');
 
 var app = express();
 app.set('views', path.join(__dirname, './views'));
@@ -8,17 +9,8 @@ app.set('view engine', 'ejs')
 app.use('/css', express.static(path.join(__dirname, '/public/css')));
 app.use('/js', express.static(path.join(__dirname, '/public/js')));
 app.use('/transfer', express.urlencoded({ extended: true}));
+app.use('/payment', express.urlencoded({ extended: true}));
 
-
-const accountData = fs.readFileSync('./src/json/accounts.json', {
-  encoding: 'UTF8'
-});
-const userData = fs.readFileSync('./src/json/users.json', {
-  encoding: 'UTF8'
-})
-
-const accounts = JSON.parse(accountData);
-const users = JSON.parse(userData);
 
 app.get('/', (req, res) => {
   res.render('index', { 
@@ -59,8 +51,7 @@ app.post('/transfer', (req, res) => {
   accounts[req.body.from].balance -= req.body.amount;
   accounts[req.body.to].balance += parseInt(req.body.amount);
 
-  accountsJSON = JSON.stringify(accounts);
-  fs.writeFileSync(path.join(__dirname, 'json/accounts.json'), accountsJSON, "UTF8");
+  writeJSON();
 
   res.render('transfer', {
     message: 'Transfer Completed'
@@ -76,8 +67,7 @@ app.get('/payment', (req, res) => {
 app.post('/payment', (req, res) => {
   accounts.credit.balance -= req.body.amount;
   accounts.credit.available += parseInt(req.body.amount);
-  accountsJSON = JSON.stringify(accounts);
-  fs.writeFileSync(path.join(__dirname, 'json/accounts.json'), accountsJSON, "UTF8");
+  writeJSON();
   res.render('payment', {
     message: "Payment SUccessful",
     account: accounts.credit
