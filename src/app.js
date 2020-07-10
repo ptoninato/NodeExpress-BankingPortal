@@ -2,6 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const { accounts, users, writeJSON} = require('./data');
+const accountRoutes = require('./routes/accounts.js');
+const servicesRoutes = require('./routes/services.js');
+
 
 var app = express();
 app.set('views', path.join(__dirname, './views'));
@@ -10,7 +13,8 @@ app.use('/css', express.static(path.join(__dirname, '/public/css')));
 app.use('/js', express.static(path.join(__dirname, '/public/js')));
 app.use('/transfer', express.urlencoded({ extended: true}));
 app.use('/payment', express.urlencoded({ extended: true}));
-
+app.use('/account', accountRoutes);
+app.use('/services', servicesRoutes);
 
 app.get('/', (req, res) => {
   res.render('index', { 
@@ -19,58 +23,9 @@ app.get('/', (req, res) => {
   });
 });
 
-app.get('/savings', (req, res) => {
-  res.render('account', {
-    account: accounts.savings
-  });
-});
-
-app.get('/checking', (req, res) => {
-  res.render('account', {
-    account: accounts.checking
-  });
-});
-
-app.get('/credit', (req, res) => {
-  res.render('account', {
-    account: accounts.credit
-  });
-});
-
 app.get('/profile', (req, res) => {
   res.render('profile', {
     user: users[0]
-  });
-});
-
-app.get('/transfer', (req, res) => {
-  res.render('transfer');
-});
-
-app.post('/transfer', (req, res) => {
-  accounts[req.body.from].balance -= req.body.amount;
-  accounts[req.body.to].balance += parseInt(req.body.amount);
-
-  writeJSON();
-
-  res.render('transfer', {
-    message: 'Transfer Completed'
-  });
-});
-
-app.get('/payment', (req, res) => {
-  res.render('payment', {
-    account: accounts.credit
-  });
-});
-
-app.post('/payment', (req, res) => {
-  accounts.credit.balance -= req.body.amount;
-  accounts.credit.available += parseInt(req.body.amount);
-  writeJSON();
-  res.render('payment', {
-    message: "Payment SUccessful",
-    account: accounts.credit
   });
 });
 
